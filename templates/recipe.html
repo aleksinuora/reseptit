@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}
+{{ name }}
+{% endblock %}
+{% block content %}
+<h2>{{ name }}</h2>
+{% if passiveTime %}
+<br />
+Passiivinen valmistusaika: {{ passiveTime }}
+{% endif %}
+{% if activeTime %}
+<br />
+Aktiivinen valmistusaika: {{ activeTime }}
+{% endif %}
+<ul>
+{% for row in ingredientList %}
+<li>{{ row[0] }} {{ row[1] }} {{ row[2] }} </li>
+{% endfor %}
+</ul>
+{% if description %}
+<br />
+{{ description }}
+{% endif %}
+<hr />
+Tänne tulee kommenttiosio
+{% endblock %}

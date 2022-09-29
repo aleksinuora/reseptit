@@ -14,21 +14,13 @@ CREATE TABLE recipe (
 );
 CREATE TABLE ingredient (
     id SERIAL PRIMARY KEY,
-    ingredient_name TEXT
-);
-CREATE TABLE measure_unit (
-    id SERIAL PRIMARY KEY,
-    unit TEXT
-);
-CREATE TABLE measure_qt (
-    id SERIAL PRIMARY KEY,
-    quantity FLOAT
+    ingredient_name TEXT UNIQUE
 );
 CREATE TABLE recipeingredient (
     recipe_id INTEGER REFERENCES recipe,
     ingredient_id INTEGER REFERENCES ingredient,
-    measure_unit_id INTEGER REFERENCES measure_unit,
-    measure_qt_id INTEGER REFERENCES measure_qt
+    unit TEXT,
+    quantity FLOAT
 );
 CREATE TABLE comment (
     id SERIAL PRIMARY KEY,

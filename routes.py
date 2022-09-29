@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, request
+from flask import render_template, request, redirect
 import recipes
 
 @app.route("/")
@@ -28,3 +28,41 @@ def recipe():
     return render_template("recipe.html", name=name, \
         passiveTime=passiveTime, activeTime=activeTime, \
             description=description, ingredientList=ingredientList)
+
+@app.route("/recipe_form/", methods=["GET", "POST"])
+def recipe_form():
+    if request.method == "POST":
+        if request.form.get("send_recipe") == "Tallenna":
+            # todo: POST to database
+            return render_template("result.html", \
+                recipe=request.form)
+        elif request.form.get("new_line") == "seuraava raaka-aine":
+            print(request.form)
+            ingredient_lines = int(request.form["ingredient_lines"]) + 1            
+            quantities = request.form.getlist("quantity")
+            units = request.form.getlist("unit")
+            ingredient_names = request.form.getlist("ingredient_name") 
+            return render_template("recipe_form.html", \
+                recipe=request.form, \
+                ingredient_lines=ingredient_lines, \
+                quantities=quantities, \
+                units=units, \
+                ingredient_names=ingredient_names)
+        elif request.form.get("remove_line").startswith("poista"):
+            target_line = request.form.get("remove_line")
+            target_index = int(target_line[slice(6, len(target_line))]) - 1
+            quantities = request.form.getlist("quantity")
+            units = request.form.getlist("unit")
+            ingredient_names=request.form.getlist("ingredient_name")
+            del quantities[target_index]
+            del units[target_index]
+            del ingredient_names[target_index]
+            return render_template("recipe_form.html", \
+                recipe=request.form, \
+                ingredient_lines=len(ingredient_names), \
+                quantities=quantities, \
+                units=units, \
+                ingredient_names=ingredient_names)
+    elif request.method == "GET":
+        return render_template("recipe_form.html", \
+            recipe=[], quantities=[], units=[], ingredient_names=[])

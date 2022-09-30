@@ -1,7 +1,6 @@
-{% set index = i + 1 %}
-Raaka-aine {{ index }}:
+Raaka-aine {{ i + 1 }}:
 <input type="number" step="any" name="quantity" value="{{ quantities[i] or 1.0 }}" style="width: 7em">
 <input type="text" name="unit" value="{{ units[i] or 'yksikkö' }}" size="3">
 <input type="text" name="ingredient_name" value="{{ ingredient_names[i] or 'nimi' }}">
-<input type="submit" name="remove_line" value="poista{{ index }}">
+<button type="submit" name="remove_line" value="{{ i }}">poista</button>
 <br>

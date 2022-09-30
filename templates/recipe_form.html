@@ -2,6 +2,7 @@
 {% block title %}Uusi resepti{% endblock %}
 {% block content%}
 <h2>Uusi resepti</h2>
+<a name="new_recipe"></a>
 <form action="/recipe_form/" method="POST">
 Reseptin nimi:
 <input type="text" name="name" value="{{ recipe.name or 'nimi' }}">
@@ -19,8 +20,8 @@ Aktiivinen valmistusaika:
 <br>
 Ohje:
 <br>
-<textarea name="description" rows="10" cols="50">
-{{ recipe.description or '...' }}
+<textarea name="recipe_description" rows="10" cols="50">
+{{ recipe.description or '' }}
 </textarea>
 <br>
 <input type="submit" name="send_recipe" value="Tallenna">

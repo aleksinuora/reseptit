@@ -1,4 +1,5 @@
 from db import db
+import datetime
 
 def get_recipe(id):
     sql = "SELECT \
@@ -27,57 +28,57 @@ def get_random_recipe():
     return result.fetchone()
 
 def add_recipe(recipe_name, passive_time, active_time, recipe_description, \
-    user_id, ingredient_list):
-    i_qts = []
-    i_units = []
-    i_names = []
-    for row in ingredient_list:
-        i_qts.append(row[0])
-        i_units.append(row[1])
-        i_names.append(row[2])
+    userprofile_id, ingredient_list):
+    i_qts = ingredient_list[0]
+    i_units = ingredient_list[1]
+    i_names = ingredient_list[2]
+    current_timestamp = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
 
     recipe_insert = "INSERT INTO recipe \
             (recipe_name, passive_time, active_time, \
-            recipe_description, user_id, created_at) \
+            recipe_description, userprofile_id, created_at) \
         VALUES \
             (:recipe_name, :passive_time, :active_time, \
-            :recipe_description, :user_id, :CURRENT_TIMESTAMP) \
+            :recipe_description, :userprofile_id, :current_timestamp) \
         RETURNING id"
     result = db.session.execute(recipe_insert, \
         {"recipe_name":recipe_name, "passive_time":passive_time, \
         "active_time":active_time, "recipe_description":recipe_description, \
-        "user_id":user_id})
+        "userprofile_id":userprofile_id, "current_timestamp":current_timestamp})
 
     recipe_id = result.fetchone()[0]
     
     ingredient_insert = "INSERT INTO ingredient \
         (ingredient_name) \
         VALUES \
-            (unnest(ARRAY:i_names)) \
+            (unnest(:i_names)) \
         ON CONFLICT DO NOTHING"
     db.session.execute(ingredient_insert, {"i_names":i_names})
     
     recipeingredient_insert = "WITH ingredients AS (\
             SELECT id \
             FROM ingredient \
-            AS ingredient_id \
-            WHERE ingredient_name = ANY(ARRAY:i_names)\
+            WHERE ingredient_name = ANY(:i_names)\
         ), \
         units AS (\
-            SELECT * FROM unnest(ARRAY:i_units)\
+            SELECT * FROM unnest(:i_units) AS unit\
         ), \
         quantities AS (\
-            SELECT * FROM unnest(ARRAY:i_qts)\
+            SELECT * FROM unnest(:i_qts) AS quantity\
         ), \
-        recipe AS (\
-            SELECT * FROM unnest(ARRAY[:recipe_id]) AS recipe_id \
-        ), \
+        recipe1 AS (\
+            SELECT * FROM unnest(ARRAY[:recipe_id]) AS id\
+        ) \
         INSERT INTO recipeingredient \
             (recipe_id, ingredient_id, unit, quantity) \
         SELECT \
-            r.recipe_id, i.ingredient_id, u.unit, q.quantity \
+            r.id, i.id, u.unit, q.quantity \
         FROM \
-            recipe r, ingredients i, units u, quantities q \
+            recipe1 r, ingredients i, units u, quantities q \
+        WHERE \
+            r.id = :recipe_id  \
         "
     db.session.execute(recipeingredient_insert, {"i_names":i_names, \
-        "i_units":i_units, "i_qts":i_qts, "recipe_id":recipe_id})
+        "i_units":i_units, "i_qts":i_qts, "recipe_id":recipe_id})    
+    db.session.commit()
+    return True

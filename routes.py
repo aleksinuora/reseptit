@@ -1,6 +1,7 @@
 from app import app
 from flask import render_template, request, redirect
 import recipes
+from utilities.form_parser import parse_recipe_form
 
 @app.route("/")
 def index():
@@ -34,35 +35,44 @@ def recipe_form():
     if request.method == "POST":
         if request.form.get("send_recipe") == "Tallenna":
             # todo: POST to database
+            recipe = parse_recipe_form(request.form)
+            result = recipes.add_recipe(recipe["recipe_name"], \
+                recipe["passive_time"], recipe["active_time"], \
+                recipe["recipe_description"], 1, \
+                recipe["ingredient_list"])
             return render_template("result.html", \
-                recipe=request.form)
+                recipe=recipe, result = result)
+                
         elif request.form.get("new_line") == "seuraava raaka-aine":
             print(request.form)
             ingredient_lines = int(request.form["ingredient_lines"]) + 1            
             quantities = request.form.getlist("quantity")
             units = request.form.getlist("unit")
-            ingredient_names = request.form.getlist("ingredient_name") 
+            ingredient_names = request.form.getlist("ingredient_name")
+
             return render_template("recipe_form.html", \
                 recipe=request.form, \
                 ingredient_lines=ingredient_lines, \
                 quantities=quantities, \
                 units=units, \
                 ingredient_names=ingredient_names)
-        elif request.form.get("remove_line").startswith("poista"):
-            target_line = request.form.get("remove_line")
-            target_index = int(target_line[slice(6, len(target_line))]) - 1
+
+        elif request.form.get("remove_line"):
+            target_line_index = int(request.form.get("remove_line"))
             quantities = request.form.getlist("quantity")
             units = request.form.getlist("unit")
             ingredient_names=request.form.getlist("ingredient_name")
-            del quantities[target_index]
-            del units[target_index]
-            del ingredient_names[target_index]
+            del quantities[target_line_index]
+            del units[target_line_index]
+            del ingredient_names[target_line_index]
+
             return render_template("recipe_form.html", \
                 recipe=request.form, \
                 ingredient_lines=len(ingredient_names), \
                 quantities=quantities, \
                 units=units, \
                 ingredient_names=ingredient_names)
+
     elif request.method == "GET":
         return render_template("recipe_form.html", \
             recipe=[], quantities=[], units=[], ingredient_names=[])

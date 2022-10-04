@@ -5,7 +5,8 @@ def get_recipe(id):
     sql = "SELECT \
             R.recipe_name, R.passive_time, R.active_time, \
             R.recipe_description, R.created_at, \
-            J.quantity, J.unit, I.ingredient_name \
+            J.quantity, J.unit, I.ingredient_name, \
+            R.userprofile_id, R.created_at \
         FROM \
             recipe R, ingredient I, recipeingredient J\
         WHERE \
@@ -55,30 +56,21 @@ def add_recipe(recipe_name, passive_time, active_time, recipe_description, \
         ON CONFLICT DO NOTHING"
     db.session.execute(ingredient_insert, {"i_names":i_names})
     
-    recipeingredient_insert = "WITH ingredients AS (\
-            SELECT id \
-            FROM ingredient \
-            WHERE ingredient_name = ANY(:i_names)\
-        ), \
-        units AS (\
-            SELECT * FROM unnest(:i_units) AS unit\
-        ), \
-        quantities AS (\
-            SELECT * FROM unnest(:i_qts) AS quantity\
-        ), \
-        recipe1 AS (\
-            SELECT * FROM unnest(ARRAY[:recipe_id]) AS id\
-        ) \
-        INSERT INTO recipeingredient \
+    for i in range (len(i_names)):
+        recipeingredient_insert = "WITH i_id AS (\
+                SELECT id \
+                FROM ingredient \
+                WHERE ingredient_name=:ingredient_name\
+            )\
+            INSERT INTO recipeingredient \
             (recipe_id, ingredient_id, unit, quantity) \
-        SELECT \
-            r.id, i.id, u.unit, q.quantity \
-        FROM \
-            recipe1 r, ingredients i, units u, quantities q \
-        WHERE \
-            r.id = :recipe_id  \
-        "
-    db.session.execute(recipeingredient_insert, {"i_names":i_names, \
-        "i_units":i_units, "i_qts":i_qts, "recipe_id":recipe_id})    
+            SELECT :recipe_id, id, :unit, :quantity \
+            FROM i_id"
+        db.session.execute(recipeingredient_insert, {"ingredient_name":i_names[i], \
+            "recipe_id":recipe_id, "unit":i_units[i], "quantity":i_qts[i]})    
     db.session.commit()
-    return True
+    return get_recipe(recipe_id)
+
+def remove_recipe(recipe_id):
+    sql = "DELETE FROM recipe WHERE id=:recipe_id"
+    db.session.execute(sql, {"recipe_id":recipe_id})

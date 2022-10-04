@@ -21,6 +21,23 @@ Aktiivinen valmistusaika: {{ activeTime }}
 <br />
 {{ description }}
 {% endif %}
+{% if submitter %}
+<br />
+<br />
+Lisännyt: {{ submitter }}
+<br />
+{{ created_at or '' }}
+{% endif %}
+{% if editing_rights %}
+<br />
+Poista resepti: 
+<form action="/delete_recipe" method="POST">
+<button type="submit" name="delete_button" onclick="return confirm('Haluatko varmasti poistaa reseptin?')" value={{ recipe_id }}>
+Poista
+</button>
+</form>
+{% endif %}
 <hr />
 Tänne tulee kommenttiosio
 {% endblock %}
+

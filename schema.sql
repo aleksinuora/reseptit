@@ -1,6 +1,6 @@
 CREATE TABLE userprofile (
     id SERIAL PRIMARY KEY,
-    userprofile_name TEXT,
+    userprofile_name TEXT UNIQUE,
     passhash TEXT
 );
 CREATE TABLE recipe (
@@ -17,7 +17,7 @@ CREATE TABLE ingredient (
     ingredient_name TEXT UNIQUE
 );
 CREATE TABLE recipeingredient (
-    recipe_id INTEGER REFERENCES recipe,
+    recipe_id INTEGER REFERENCES recipe ON DELETE CASCADE,
     ingredient_id INTEGER REFERENCES ingredient,
     unit TEXT,
     quantity FLOAT
@@ -27,5 +27,5 @@ CREATE TABLE comment (
     content TEXT,
     sent_at TIMESTAMP,
     userprofile_id INTEGER REFERENCES userprofile,
-    recipe_id INTEGER REFERENCES recipe
+    recipe_id INTEGER REFERENCES recipe ON DELETE CASCADE
 );

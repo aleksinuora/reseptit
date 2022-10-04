@@ -46,7 +46,7 @@ def recipe():
 def recipe_form():
     if request.method == "POST":
         if request.form.get("send_recipe") == "Tallenna":
-            user_id = users.find_user(session["username"])
+            user_id = users.find_user(session["username"])[0]
             recipe = parse_recipe_form(request.form)
             result = recipes.add_recipe(recipe["recipe_name"], \
                 recipe["passive_time"], recipe["active_time"], \

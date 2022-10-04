@@ -2,7 +2,7 @@
 {% block title %}Uusi käyttäjä{% endblock %}
 {% block content %}
 <h2>Luo uusi käyttäjä</h2>
-<form action="/" method="POST">
+<form action="/new_user_form" method="POST">
 <input type="text" pattern="\S+.+" name="username" value="käyttäjätunnus">
 <input type="text" pattern="\S+" name="password" value="salasana">
 <input type="submit" name="submit_user" value="Luo käyttäjä">

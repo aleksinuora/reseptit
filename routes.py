@@ -4,7 +4,7 @@ from os import getenv
 import recipes
 import login
 import users
-from utilities.form_parser import parse_recipe_form
+from utilities.parsers import parse_recipe_form, parse_search
 
 app.secret_key = getenv("SECRET_KEY")
 
@@ -111,7 +111,56 @@ def new_user_form():
 @app.route("/delete_recipe", methods=["POST"])
 def delete_recipe():
     if request.form.get("delete_button"):
-        recipes.remove_recipe(request.form.get("delete_button"))
+        recipes.remove_recipe(request.form.get("delete_button"), \
+            user=session["username"])
         return redirect("/")
     recipe_id = request.form.get("delete_button")
     return redirect(url_for("recipe", id=recipe_id))
+
+@app.route("/browse_recipes", methods=["GET", "POST"])
+def browse_recipes():
+    if request.method == "GET":
+        recipe_list = recipes.get_all_recipes()
+        return render_template("browse_recipes.html", recipes=recipe_list)
+    if request.method == "POST":
+        terms = request.form.getlist("terms")
+        term_types = request.form.getlist("term_types")
+        term_line_count = int(request.form.get("term_line_count"))
+        recipe_name = request.form.get("recipe_name", "")
+        if request.form.get("submit_search") == "Hae":
+            recipe_list = recipes.get_match_all(parse_search(request.form))
+            return render_template("browse_recipes.html", \
+                terms=terms, term_line_count=term_line_count, \
+                recipe_name=recipe_name, term_types=term_types, \
+                recipes=recipe_list)
+        elif request.form.get("new_line") == "lisää hakuehto":
+            term_line_count += 1             
+        elif request.form.get("remove_line"):
+            target_line_index = int(request.form.get("remove_line"))
+            del terms[target_line_index]
+            term_line_count += -1
+        return render_template("browse_recipes.html", terms=terms, \
+            term_line_count=term_line_count, recipe_name=recipe_name, \
+            term_types=term_types)
+
+@app.route("/user")
+def user():
+    username = request.args.get("username", None)
+    user_recipes = recipes.get_match_all({"user":username})
+    user_rights = username == session["username"] or \
+        session["username"] == "admin"
+    return render_template("user.html", user_rights = user_rights, \
+        username=username, recipes=user_recipes)
+
+@app.route("/delete_user", methods=["POST"])
+def delete_user():
+    username = request.args.get("username")
+    session_user = session["username"]
+    user_rights = username == session_user or \
+        session_user == "admin"
+    if user_rights:
+        print("HALOO ", session["username"])
+        users.delete_user(username, user=session_user)
+    if session["username"] != "admin":
+        return redirect("/logout")
+    return redirect("/") 

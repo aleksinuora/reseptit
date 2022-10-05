@@ -1,8 +1,11 @@
 <title>Ruokaideoita - {% block title %}{% endblock %}</title>
 <h1>Ruokaideoita</h1>
-<a href="/"> Etusivu </a> 
+<a href="/"> Etusivu </a>
+<a href="/browse_recipes"> Selaa reseptejä </a>
+{% if session.username %}
 <a href="/recipe_form/#new_recipe"> Lisää resepti </a>
-Tähän tulee nav-bar {% include 'login_element.html' %}
+{% endif %}
+{% include 'login_element.html' %}
 <hr />
 {% block content %}{% endblock %}
 <hr />

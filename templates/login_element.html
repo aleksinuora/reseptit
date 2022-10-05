@@ -1,6 +1,7 @@
 {% if session.username %}
-Kirjautuneena nimellä {{ session.username }}
 <form action="/logout" method="GET">
+Kirjautuneena nimellä 
+<a href="/user?username={{ session.username }}">{{ session.username }}</a>
 <input type="submit" name="logout" value="Kirjaudu ulos">
 </form>
 {% else %}

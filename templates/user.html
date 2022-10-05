@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block title %}{{ username }}{% endblock %}
+{% block content %}
+<h2>{{ username }}</h2>
+{% if recipes %}
+Käyttäjän reseptit:
+{% include "recipe_list.html" %}
+{% endif %}
+<form action="/delete_user?username={{ username }}" method="POST">
+Poista tili:
+<button type="submit" name="delete_button" onclick="return confirm('Haluatko varmasti poistaa käyttäjätilin?')" value={{ username }}>
+poista
+</button>
+</form>
+{% endblock %}

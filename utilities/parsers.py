@@ -45,3 +45,20 @@ def parse_time(time):
         time = hours + ' hours '
     time = time + minutes + ' minutes'
     return time
+
+def parse_search(form):
+    terms = form.getlist("terms")
+    term_types = form.getlist("term_types")
+    ingredients = list()
+    user = ""
+    for i in range (len(terms)):
+        if term_types[i] == "ingredients":
+            ingredients.append(terms[i])
+        elif term_types[i] == "user":
+            user = terms[i]
+    search_terms = {
+        "recipe_name": form.get("recipe_name", ""),
+        "ingredients": ingredients,
+        "user": user
+    }
+    return search_terms

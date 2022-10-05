@@ -1,5 +1,6 @@
 from db import db
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask import session
 
 def find_user(username):
     sql = "SELECT id, passhash \
@@ -17,4 +18,10 @@ def add_user(username, password):
         VALUES (:username, :hash_value)"
     db.session.execute(sql, {"username":username, "hash_value":hash_value})
     db.session.commit()
-    
+
+def delete_user(username, **kvargs):
+    sql = "DELETE FROM userprofile WHERE userprofile_name=:username"
+    db.session.execute(sql, {"username":username})
+
+    if kvargs["user"] != "Testaaja":
+        db.session.commit()

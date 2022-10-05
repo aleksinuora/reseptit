@@ -24,7 +24,8 @@ Aktiivinen valmistusaika: {{ activeTime }}
 {% if submitter %}
 <br />
 <br />
-Lisännyt: {{ submitter }}
+Lisännyt: 
+<a href="/user?username={{ submitter }}">{{ submitter }}</a>
 <br />
 {{ created_at or '' }}
 {% endif %}

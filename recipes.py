@@ -28,6 +28,88 @@ def get_random_recipe():
     result = db.session.execute(sql)
     return result.fetchone()
 
+def get_all_recipes():
+    sql = "SELECT \
+            id, recipe_name \
+        FROM \
+            recipe \
+        GROUP BY \
+            id \
+        ORDER BY \
+            recipe_name ASC, id"
+    result = db.session.execute(sql)
+    return result.fetchall()
+
+def get_match_all(search_terms):
+    filter_string = ""
+    if search_terms.get("ingredients", []) != []:
+        ingredient_constraints = [(-1,)]
+        ingredient_filter_sql = "\
+            WITH \
+            ingredient_names AS (\
+                SELECT * \
+                FROM unnest(:ingredients) \
+                AS ingredient_names\
+            ),    \
+            ingredient_ids AS (\
+                SELECT DISTINCT \
+                    id \
+                FROM \
+                    ingredient \
+                WHERE \
+                    ingredient_name = ANY (\
+                        SELECT * FROM ingredient_names)\
+            ) \
+            SELECT DISTINCT \
+                recipe_id AS recipe_id\
+            FROM \
+                recipeingredient \
+            WHERE \
+                ingredient_id = ANY (\
+                    SELECT * FROM ingredient_ids) \
+            "
+        
+        ingredient_result = db.session.execute(ingredient_filter_sql, \
+            {"ingredients":search_terms.get("ingredients")}).fetchall()
+        if ingredient_result:
+            ingredient_constraints = ingredient_result
+        for [line] in ingredient_constraints:
+            filter_string += " AND id=" + str(line) + " "
+  
+   
+    if search_terms.get("user", "") != "":
+        user_constraint = -1
+        user_filter_sql = "\
+            SELECT id AS userprofile_id\
+            FROM userprofile \
+            WHERE userprofile_name = :user\
+            "
+        user_result = db.session.execute(user_filter_sql, \
+            {"user":search_terms.get("user")}).fetchone()
+        if user_result:
+            user_constraint = user_result.userprofile_id
+        filter_string += " AND userprofile_id=" + str(user_constraint) + " "
+
+    recipe_name = search_terms.get("recipe_name", "")
+    sql = "\
+        SELECT \
+            id, recipe_name \
+        FROM \
+            recipe \
+        WHERE \
+            id = id \
+        AND \
+            LOWER (recipe_name) LIKE LOWER (Concat(:recipe_name, '%')) " \
+        + filter_string + "\
+        GROUP BY \
+            id \
+        ORDER BY \
+            recipe_name ASC, id\
+        "
+    result = db.session.execute(sql, \
+        {"recipe_name":search_terms.get("recipe_name", "")})
+    return result.fetchall()
+
 def add_recipe(recipe_name, passive_time, active_time, recipe_description, \
     userprofile_id, ingredient_list):
     i_qts = ingredient_list[0]
@@ -71,6 +153,9 @@ def add_recipe(recipe_name, passive_time, active_time, recipe_description, \
     db.session.commit()
     return get_recipe(recipe_id)
 
-def remove_recipe(recipe_id):
+def remove_recipe(recipe_id, **kvargs):
     sql = "DELETE FROM recipe WHERE id=:recipe_id"
     db.session.execute(sql, {"recipe_id":recipe_id})
+
+    if kvargs["user"] != "Testaaja":
+        db.session.commit()

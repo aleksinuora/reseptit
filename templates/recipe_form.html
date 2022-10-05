@@ -14,7 +14,7 @@ Aktiivinen valmistusaika:
 <input type="text" pattern="(\d+t|) (([0-5])(\d)m|0)" name="active_time" value="{{ recipe.active_time or '0t 00m' }}" size="2">
 <br>
 {% for i in range(ingredient_lines or 1) %}
-{% include 'ingredient_line.html' %}
+{% include "ingredient_line.html" %}
 {% endfor %}
 <input type="submit" name="new_line" value="seuraava raaka-aine">
 <br>
@@ -27,7 +27,4 @@ Ohje:
 <input type="submit" name="send_recipe" value="Tallenna">
 <input type="hidden" name="ingredient_lines" value={{ ingredient_lines or 1 }}>
 </form>
-(Raaka-aineita: {{ ingredient_lines or 1 }})
-{% set test = recipe %}
-(Koetuloste: {{ test or '' }})
 {% endblock %}

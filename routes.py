@@ -147,20 +147,20 @@ def browse_recipes():
 def user():
     username = request.args.get("username", None)
     user_recipes = recipes.get_match_all({"user":username})
-    user_rights = username == session["username"] or \
-        session["username"] == "admin"
-    return render_template("user.html", user_rights = user_rights, \
+    user_rights = username == session.get("username", None) or \
+        session.get("username") == "admin"
+    return render_template("user.html", user_rights=user_rights, \
         username=username, recipes=user_recipes)
 
 @app.route("/delete_user", methods=["POST"])
 def delete_user():
     username = request.args.get("username")
-    session_user = session["username"]
+    session_user = session.get("username")
     user_rights = username == session_user or \
         session_user == "admin"
     if user_rights:
         print("HALOO ", session["username"])
         users.delete_user(username, user=session_user)
-    if session["username"] != "admin":
+    if session.get("username") != "admin":
         return redirect("/logout")
     return redirect("/") 

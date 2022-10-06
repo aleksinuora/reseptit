@@ -1,0 +1,15 @@
+<a name="comment_{{ comment.id }}"></a>
+<b>{{ comment.userprofile_name }}</b>
+<br />
+<i>{{ comment.sent_at }}</i>
+<br />
+<br />
+{{ comment.content }}
+{% if session.username == comment.userprofile_name or session.username == 'admin' %}
+<br />
+<br />
+<form action="/recipe?id={{ recipe_id }}" method="POST">
+<button type="submit" name="remove_comment" value="{{ comment.id }}" onclick="return confirm('Haluatko varmasti poistaa kommentin?')">Poista</button>
+</form>
+{% endif %}
+<hr>

@@ -1,0 +1,12 @@
+<h3>Kommenttiosio</h3>
+{% if session.username %}
+Lähetä kommentti:
+<form action="/recipe?id={{ recipe_id }}" method="POST">
+<textarea name="new_comment_text" rows="3" cols="25"></textarea>
+<br />
+<input type="submit" name="send_comment" value="Lähetä">
+</form> 
+{% endif %}
+{% for comment in comments %}
+{% include "comment.html" %}
+{% endfor %}

@@ -26,6 +26,6 @@ CREATE TABLE comment (
     id SERIAL PRIMARY KEY,
     content TEXT,
     sent_at TIMESTAMP,
-    userprofile_id INTEGER REFERENCES userprofile,
+    userprofile_id INTEGER REFERENCES userprofile ON DELETE SET NULL,
     recipe_id INTEGER REFERENCES recipe ON DELETE CASCADE
 );

@@ -3,9 +3,26 @@
 {% block content %}
 <h2>{{ username }}</h2>
 {% if recipes %}
-Käyttäjän reseptit:
+<b>Reseptit:</b>
 {% include "recipe_list.html" %}
 {% endif %}
+{% if comments %}
+<b>Kommenttihistoria:</b>
+<form action="/user?username={{ username }}" method="POST">
+<button type="submit" name="hide_comments" value="{{ username }}">Piilota</button>
+</form>
+<hr>
+{% for comment in comments %}
+(<a href="/recipe?id={{ comment.recipe_id }}#comment_{{ comment.id }}">Konteksti</a>)
+{% include "comment.html" %}
+{% endfor %}
+{% else %}
+<form action="/user?username={{ username }}" method="POST">
+Näytä käyttäjän kommentit: 
+<button type="submit" name="show_comments" value="{{ username }}">Näytä</button>
+</form>
+{% endif %}
+<br />
 {% if user_rights %}
 <form action="/delete_user?username={{ username }}" method="POST">
 Poista tili:

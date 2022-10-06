@@ -4,6 +4,7 @@ from os import getenv
 import recipes
 import login
 import users
+import comments
 from utilities.parsers import parse_recipe_form, parse_search
 
 app.secret_key = getenv("SECRET_KEY")
@@ -18,7 +19,7 @@ def index():
     return render_template("index.html", id=id, name=name, \
         passiveTime=passiveTime, activeTime=activeTime)
 
-@app.route("/recipe", methods=["GET"])
+@app.route("/recipe", methods=["GET", "POST"])
 def recipe():
     id = request.args.get("id", None)
     recipe = recipes.get_recipe(id)
@@ -34,13 +35,20 @@ def recipe():
     submitter = users.get_username(recipeHead.userprofile_id)
     created_at = recipeHead.created_at
     editing_rights = session.get("username") == "admin" \
-        or session.get("username") == submitter
-
+        or session.get("username") == submitter    
+    if request.method == "POST":
+        if request.form.get("remove_comment"):
+            comments.delete_comment(request.form.get("remove_comment"))
+        if request.form.get("send_comment"):
+            user_id = users.find_user(session.get("username")).id
+            content = request.form.get("new_comment_text")
+            comments.send_recipe_comment(content, user_id, id)    
+    recipe_comments = comments.get_recipe_comments(id)
     return render_template("recipe.html", name=name, \
         passiveTime=passiveTime, activeTime=activeTime, \
             description=description, ingredientList=ingredientList, \
             submitter=submitter, editing_rights=editing_rights, \
-            created_at=created_at, recipe_id=id)
+            created_at=created_at, recipe_id=id, comments=recipe_comments)
 
 @app.route("/recipe_form/", methods=["GET", "POST"])
 def recipe_form():
@@ -55,7 +63,6 @@ def recipe_form():
             return render_template("result.html", \
                 recipe=recipe, result = result)                
         elif request.form.get("new_line") == "seuraava raaka-aine":
-            print(request.form)
             ingredient_lines = int(request.form["ingredient_lines"]) + 1            
             quantities = request.form.getlist("quantity")
             units = request.form.getlist("unit")
@@ -143,14 +150,18 @@ def browse_recipes():
             term_line_count=term_line_count, recipe_name=recipe_name, \
             term_types=term_types)
 
-@app.route("/user")
+@app.route("/user", methods=["GET", "POST"])
 def user():
     username = request.args.get("username", None)
     user_recipes = recipes.get_match_all({"user":username})
+    recipe_comments = None
     user_rights = username == session.get("username", None) or \
         session.get("username") == "admin"
+    if request.method == "POST":
+        if request.form.get("show_comments"):
+            recipe_comments = comments.get_user_comments(username)
     return render_template("user.html", user_rights=user_rights, \
-        username=username, recipes=user_recipes)
+        username=username, recipes=user_recipes, comments=recipe_comments)
 
 @app.route("/delete_user", methods=["POST"])
 def delete_user():
@@ -159,7 +170,6 @@ def delete_user():
     user_rights = username == session_user or \
         session_user == "admin"
     if user_rights:
-        print("HALOO ", session["username"])
         users.delete_user(username, user=session_user)
     if session.get("username") != "admin":
         return redirect("/logout")

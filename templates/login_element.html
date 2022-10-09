@@ -1,16 +1,15 @@
-{% if session.username %}
-<form action="/logout" method="GET">
-Kirjautuneena nimellä 
-<a href="/user?username={{ session.username }}">{{ session.username }}</a>
-<input type="submit" name="logout" value="Kirjaudu ulos">
-</form>
-{% else %}
-<form action="/login" method="POST">
-Kirjaudu sisään:
-<input type="text" name="username" value="käyttäjätunnus">
-<input type="text" name="password" value="salasana">
-<input type="submit" name="submit_login" value="Kirjaudu">
-tai
-<a href="/new_user_form"> luo uusi tili</a>
-</form>
-{% endif %}
+{% extends "layout.html" %}
+{% block title %}Kirjaudu sisään{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="form-group col-4">
+            <form action="/login" method="POST">
+            <input type="text" class="form-control" name="username" value="käyttäjätunnus">
+            <input type="text" class="form-control" name="password" value="salasana">
+            <input type="submit" class="btn btn-primary" name="submit_login" value="Kirjaudu">
+            tai
+            <a href="/new_user_form"> luo uusi tili</a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -12,17 +12,17 @@ app.secret_key = getenv("SECRET_KEY")
 @app.route("/")
 def index():
     recipe = recipes.get_random_recipe()
-    id = recipe[0]
-    name = recipe[1]
-    passiveTime = recipe[2]
-    activeTime = recipe[3]
+    id = recipe.id
+    name = recipe.recipe_name
+    passiveTime = recipe.passive_time
+    activeTime = recipe.active_time
     return render_template("index.html", id=id, name=name, \
         passiveTime=passiveTime, activeTime=activeTime)
 
 @app.route("/recipe", methods=["GET", "POST"])
 def recipe():
-    id = request.args.get("id", None)
-    recipe = recipes.get_recipe(id)
+    recipe_id = request.args.get("recipe_id", None)
+    recipe = recipes.get_recipe(recipe_id)
     recipeHead = recipe[0]
     name = recipeHead.recipe_name
     passiveTime = recipeHead.passive_time
@@ -34,21 +34,35 @@ def recipe():
         ingredientList.append(ingredient)
     submitter = users.get_username(recipeHead.userprofile_id)
     created_at = recipeHead.created_at
+    comment_to_edit = None
     editing_rights = session.get("username") == "admin" \
         or session.get("username") == submitter    
     if request.method == "POST":
-        if request.form.get("remove_comment"):
+        if (request.form.get("remove_comment") != None):
             comments.delete_comment(request.form.get("remove_comment"))
         if request.form.get("send_comment"):
             user_id = users.find_user(session.get("username")).id
             content = request.form.get("new_comment_text")
-            comments.send_recipe_comment(content, user_id, id)    
-    recipe_comments = comments.get_recipe_comments(id)
+            comments.send_recipe_comment(content, user_id, recipe_id)
+        if (request.form.get("edit_comment") != None):
+            comment_id = request.form.get("edit_comment")
+            comment_content = request.form.get("comment_content")
+            recipe_id = request.form.get("recipe_id")
+            comment_to_edit = {
+                "id":comment_id,
+                "content":comment_content,
+                "recipe_id":recipe_id
+                }
+        if (request.form.get("save_edit") == "Tallenna"):
+            comments.edit_comment(request.form.get("comment_to_edit_id"), \
+                request.form.get("new_comment_text"))
+    recipe_comments = comments.get_recipe_comments(recipe_id)
     return render_template("recipe.html", name=name, \
         passiveTime=passiveTime, activeTime=activeTime, \
             description=description, ingredientList=ingredientList, \
             submitter=submitter, editing_rights=editing_rights, \
-            created_at=created_at, recipe_id=id, comments=recipe_comments)
+            created_at=created_at, recipe_id=recipe_id, \
+            comments=recipe_comments, comment_to_edit=comment_to_edit)
 
 @app.route("/recipe_form/", methods=["GET", "POST"])
 def recipe_form():
@@ -91,8 +105,10 @@ def recipe_form():
         return render_template("recipe_form.html", \
             recipe=[], quantities=[], units=[], ingredient_names=[])
 
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["GET", "POST"])
 def handle_login():
+    if request.method == "GET":
+        return render_template("login_element.html")
     username = request.form["username"]
     password = request.form["password"]
     if login.check_login(username, password):

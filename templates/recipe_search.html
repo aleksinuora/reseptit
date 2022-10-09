@@ -1,17 +1,17 @@
 <form action="/browse_recipes" method="POST">
-<input type="text" name="recipe_name" value="{{ recipe_name or '' }}">
-{% for i in range(term_line_count or 0) %}
-<br />
-<input type="text" name="terms" value="{{ terms[i] or '' }}">
-<select name="term_types">
-<option value="ingredients" {% if term_types[i] == 'ingredients' %}selected{% endif %}>raaka-aine</option>
-<option value="user" {% if term_types[i] == 'user' %}selected{% endif %}>käyttäjältä</option>
-</select>
-<button type="submit" name="remove_line" value="{{ i }}">poista</button>
-{% endfor %}
-<br />
-<input type="submit" name="new_line" value="lisää hakuehto">
-<br />
-<input type="submit" name="submit_search" value="Hae">
+    <input type="text" name="recipe_name" value="{{ recipe_name or '' }}">
+    {% for i in range(term_line_count or 0) %}
+        <br />
+        <input type="text" name="terms" value="{{ terms[i] or '' }}">
+        <select name="term_types">
+            <option value="ingredients" {% if term_types[i] == 'ingredients' %}selected{% endif %}>raaka-aine</option>
+            <option value="user" {% if term_types[i] == 'user' %}selected{% endif %}>käyttäjältä</option>
+        </select>
+        <button type="submit" name="remove_line" value="{{ i }}">poista</button>
+    {% endfor %}
+    <br />
+    <input type="submit" name="new_line" value="lisää hakuehto">
+    <br />
+    <input type="submit" name="submit_search" value="Hae">
 <input type="hidden" name="term_line_count" value="{{ term_line_count or 0 }}">
 </form>

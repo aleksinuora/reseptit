@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block title %}Selaa reseptejä{% endblock %}
 {% block content %}
-<h3>Reseptihaku:</h3>
-{% include "recipe_search.html" %}
-<hr>
-{% if recipes %}
-{% include "recipe_list.html" %}
-{% endif %}
+    <h3>Reseptihaku:</h3>
+    {% include "recipe_search.html" %}
+    <hr>
+    {% if recipes %}
+        {% include "recipe_list.html" %}
+    {% endif %}
 {% endblock %}

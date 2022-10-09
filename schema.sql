@@ -27,5 +27,6 @@ CREATE TABLE comment (
     content TEXT,
     sent_at TIMESTAMP,
     userprofile_id INTEGER REFERENCES userprofile ON DELETE SET NULL,
-    recipe_id INTEGER REFERENCES recipe ON DELETE CASCADE
+    recipe_id INTEGER REFERENCES recipe ON DELETE CASCADE,
+    last_edited TIMESTAMP
 );

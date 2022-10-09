@@ -17,7 +17,7 @@ def get_recipe_comments(id):
         ) \
         SELECT DISTINCT \
             c.id, c.content, c.sent_at, c.userprofile_id, \
-            c.recipe_id, u.userprofile_name \
+            c.recipe_id, u.userprofile_name, c.last_edited \
         FROM c \
         JOIN \
         u \
@@ -28,13 +28,13 @@ def get_recipe_comments(id):
 
 def get_user_comments(username):
     sql = "WITH uid AS (\
-            SELECT id \
+            SELECT id AS userprofile_id \
             FROM userprofile \
             WHERE userprofile_name=:username \
         )\
-        SELECT * \
-        FROM comment, uid \
-        WHERE userprofile_id=uid.id"
+        SELECT c.* \
+        FROM comment c, uid u \
+        WHERE c.userprofile_id=u.userprofile_id"
     result = db.session.execute(sql, {"username":username})
     return result.fetchall()
 
@@ -53,4 +53,13 @@ def send_recipe_comment(content, user_id, recipe_id):
 def delete_comment(id):
     sql = "DELETE FROM comment WHERE id = :id"
     db.session.execute(sql, {"id":id})
+    db.session.commit()
+
+def edit_comment(id, new_comment):
+    current_timestamp = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
+    sql = "UPDATE comment \
+        SET content=:new_comment, last_edited=:current_timestamp \
+        WHERE id=:id"
+    db.session.execute(sql, {"id":id, "new_comment":new_comment, \
+        "current_timestamp":current_timestamp})
     db.session.commit()

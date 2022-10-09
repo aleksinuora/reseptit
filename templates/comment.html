@@ -1,15 +1,25 @@
 <a name="comment_{{ comment.id }}"></a>
-<b>{{ comment.userprofile_name }}</b>
+<a href="/user?username={{ comment.userprofile_name }}">
+    <b>{{ comment.userprofile_name }}</b>
+</a>
 <br />
 <i>{{ comment.sent_at }}</i>
 <br />
 <br />
 {{ comment.content }}
-{% if session.username == comment.userprofile_name or session.username == 'admin' %}
-<br />
-<br />
-<form action="/recipe?id={{ recipe_id }}" method="POST">
-<button type="submit" name="remove_comment" value="{{ comment.id }}" onclick="return confirm('Haluatko varmasti poistaa kommentin?')">Poista</button>
-</form>
+{% if comment.last_edited %}
+    <br />
+    <br />
+    <i>Viimeksi muokattu: {{ comment.last_edited }}</i>
+{% endif %}
+{% if session.username == comment.userprofile_name or session.username == 'admin' or user_rights %}
+    <br />
+    <br />
+    <form action="/recipe?recipe_id={{ comment.recipe_id }}" method="POST">
+        <button type="submit" name="edit_comment" value="{{ comment.id }}">Muokkaa</button>
+        <button type="submit" name="remove_comment" value="{{ comment.id }}" onclick="return confirm('Haluatko varmasti poistaa kommentin?')">Poista</button>
+        <input type="hidden" name="recipe_id" value="{{ comment.recipe_id }}">
+        <input type="hidden" name="comment_content" value="{{ comment.content }}">
+    </form>
 {% endif %}
 <hr>

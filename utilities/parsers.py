@@ -1,14 +1,5 @@
 import re
 
-# The recipe form is a dictionary with fields:
-# name (str), passive_time ('Xt XXm'), active_time ('Xt XXm'),
-# recipe_description (str),
-# ingredient_list ({
-#   quantity: [float],
-#   unit: [str],
-#   ingredient_name: [str]
-#   })
-
 def parse_recipe_form(form):
     recipe_name = form.get("name")
     passive_time = form.get("passive_time")

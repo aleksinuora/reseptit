@@ -32,7 +32,7 @@ def get_user_comments(username):
             FROM userprofile \
             WHERE userprofile_name=:username \
         )\
-        SELECT c.* \
+        SELECT c.*, :username AS userprofile_name \
         FROM comment c, uid u \
         WHERE c.userprofile_id=u.userprofile_id"
     result = db.session.execute(sql, {"username":username})

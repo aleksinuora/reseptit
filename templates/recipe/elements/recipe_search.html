@@ -1,5 +1,5 @@
 <form action="/browse_recipes" method="POST">
-    <input type="text" name="recipe_name" value="{{ recipe_name or '' }}">
+    <input type="text" name="recipe_name" placeholder="reseptin nimi" value="{{ recipe_name }}">
     {% for i in range(term_line_count or 0) %}
         <br />
         <input type="text" name="terms" value="{{ terms[i] or '' }}">

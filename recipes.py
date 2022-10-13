@@ -110,6 +110,57 @@ def get_match_all(search_terms):
         {"recipe_name":search_terms.get("recipe_name", "")})
     return result.fetchall()
 
+def update_recipe(recipe_id, recipe_name, passive_time, active_time, \
+    recipe_description, ingredient_list):
+    i_qts = ingredient_list[0]
+    i_units = ingredient_list[1]
+    i_names = ingredient_list[2]
+
+    recipe_update = "UPDATE recipe \
+        SET \
+            recipe_name=:recipe_name, \
+            passive_time=:passive_time, \
+            active_time=:active_time, \
+            recipe_description=:recipe_description \
+        WHERE id=:recipe_id"
+    
+    ingredient_update = "INSERT INTO ingredient (ingredient_name) \
+        VALUES (unnest(:i_names)) \
+        ON CONFLICT DO NOTHING"
+    
+    sql = "WITH recipe_udpate AS (\
+        " + recipe_update + "\
+        ), \
+        ingredient_update AS (\
+        " + ingredient_update + " \
+        ) \
+        DELETE FROM recipeingredient \
+        WHERE recipe_id=:recipe_id"
+    
+    db.session.execute(sql, {"recipe_name":recipe_name, \
+        "passive_time":passive_time, "active_time":active_time, \
+        "recipe_description":recipe_description, "i_names":i_names, \
+        "recipe_id":recipe_id})
+    
+    for i in range (len(i_names)):
+        recipeingredient_insert = "WITH i_id AS (\
+                SELECT id \
+                FROM ingredient \
+                WHERE ingredient_name=:ingredient_name\
+            )\
+            INSERT INTO recipeingredient \
+            (recipe_id, ingredient_id, unit, quantity) \
+            SELECT :recipe_id, id, :unit, :quantity \
+            FROM i_id"
+        db.session.execute(recipeingredient_insert, {"ingredient_name":i_names[i], \
+            "recipe_id":recipe_id, "unit":i_units[i], "quantity":i_qts[i]})
+
+    db.session.commit()
+    return get_recipe(recipe_id)
+
+
+    
+
 def add_recipe(recipe_name, passive_time, active_time, recipe_description, \
     userprofile_id, ingredient_list):
     i_qts = ingredient_list[0]

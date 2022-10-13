@@ -12,7 +12,7 @@
     <br />
     <i>Viimeksi muokattu: {{ comment.last_edited }}</i>
 {% endif %}
-{% if session.username == comment.userprofile_name or session.username == 'admin' or user_rights %}
+{% if session['username'] == comment.userprofile_name or session['username'] == 'admin' or params.user_rights %}
     <br />
     <br />
     <form action="/recipe?recipe_id={{ comment.recipe_id }}" method="POST">
@@ -20,6 +20,7 @@
         <button type="submit" name="remove_comment" value="{{ comment.id }}" onclick="return confirm('Haluatko varmasti poistaa kommentin?')">Poista</button>
         <input type="hidden" name="recipe_id" value="{{ comment.recipe_id }}">
         <input type="hidden" name="comment_content" value="{{ comment.content }}">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     </form>
 {% endif %}
 <hr>

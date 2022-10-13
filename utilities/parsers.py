@@ -1,6 +1,6 @@
 import re
 
-def parse_recipe_form(form):
+def parse_form_to_recipe(form):
     recipe_name = form.get("name")
     passive_time = form.get("passive_time")
     if passive_time:
@@ -24,11 +24,9 @@ def parse_recipe_form(form):
         'ingredient_list': ingredient_list
     }
     return values
-    
-
 
 def parse_time(time):
-    words = str.split(time)
+    words = time.split()
     hours = words[0][:-1]
     minutes = words[1][:-1]
     time = ''
@@ -53,3 +51,39 @@ def parse_search(form):
         "user": user
     }
     return search_terms
+
+def parse_recipe_to_form(recipe):
+    active_time = parse_time_reverse(str(recipe[0].active_time))
+    passive_time = parse_time_reverse(str(recipe[0].passive_time))
+    quantities = []
+    units = []
+    ingredient_names = []
+    for row in recipe:
+        quantities.append(row.quantity)
+        units.append(row.unit)
+        ingredient_names.append(row.ingredient_name)
+    recipe_form = {
+        "name":recipe[0].recipe_name,
+        "active_time":active_time,
+        "passive_time":passive_time,
+        "quantities": quantities,
+        "units": units,
+        "ingredient_names": ingredient_names,
+        "recipe_description": recipe[0].recipe_description
+    }
+    return recipe_form
+
+def parse_time_reverse(time):
+    if (str(time) == "None"):
+        return None
+    hours = 0
+    if "day" in time:
+        days = time.split(" day")[0]
+        hours += int(days) * 24
+        time = time.split(", ")
+        time = time[1:2]
+        time = ''.join(time)
+    time = time.split(":")
+    hours += int(time[0])
+    minutes = int(time[1])
+    return str(hours) + "t " + str(minutes) + "m"

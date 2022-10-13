@@ -1,6 +1,10 @@
-- reseptien editointi
-  x kommenttien editointi
+x reseptien editointi
+	x tietokanta
 - reseptikategoriat
 - refaktorointia
-  x css
+	x saako template-hakemistoa muuttaa vai uliseeko sqlalchemy? (vastaus: saa)
+	- form-elementti joka iteroi sanakirjan hidden inputeiksi? (SOS)
 - virheviestit
+- reseptiparseri
+- csrf
+- linttaus

@@ -4,7 +4,7 @@
     <h2>{{ username }}</h2>
     {% if recipes %}
         <b>Reseptit:</b>
-        {% include "recipe_list.html" %}
+        {% include "/recipe/elements/recipe_list.html" %}
     {% endif %}
     {% if comments %}
         <b>Kommenttihistoria:</b>
@@ -14,7 +14,8 @@
         <hr>
         {% for comment in comments %}
             (<a href="/recipe?recipe_id={{ comment.recipe_id }}#comment_{{ comment.id }}">Konteksti</a>)
-            {% include "comment.html" %}
+            <br />
+            {% include "/recipe/elements/comment.html" %}
         {% endfor %}
     {% else %}
         <form action="/user?username={{ username }}" method="POST">
@@ -29,6 +30,7 @@
             <button type="submit" name="delete_button" onclick="return confirm('Haluatko varmasti poistaa käyttäjätilin?')" value={{ username }}>
                 poista
             </button>
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         </form>
     {% endif %}
 {% endblock %}

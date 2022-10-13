@@ -2,13 +2,13 @@
 {% block title %}Etusivu{% endblock %}
 {% block content%}
     Satunnainen reseptiehdotus:
-    <a href="/recipe?recipe_id={{ id }}"><h2>{{ name }}</h2></a>
-    {% if passiveTime %}
+    <a href="/recipe?recipe_id={{ params.recipe_id }}"><h2>{{ params.recipe_name }}</h2></a>
+    {% if params.passive_time %}
     <br />
-    Passiivinen valmistusaika: {{ passiveTime }}
+    Passiivinen valmistusaika: {{ params.passive_time }}
     {% endif %}
-    {% if activeTime %}
+    {% if params.active_time %}
         <br />
-        Aktiivinen valmistusaika: {{ activeTime }}
+        Aktiivinen valmistusaika: {{ params.active_time }}
     {% endif %}
 {% endblock %}

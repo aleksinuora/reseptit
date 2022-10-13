@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask import session
 
 def find_user(username):
-    sql = "SELECT id, passhash \
+    sql = "SELECT id, userprofile_name, passhash \
         FROM userprofile WHERE userprofile_name=:username"
     return db.session.execute(sql, {"username":username}).fetchone()
 
@@ -25,3 +25,8 @@ def delete_user(username, **kvargs):
 
     if kvargs["user"] != "Testaaja":
         db.session.commit()
+
+def get_users():
+    sql = "SELECT id, userprofile_name FROM userprofile ORDER BY userprofile_name ASC"
+    result = db.session.execute(sql)
+    return result.fetchall()

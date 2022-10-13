@@ -9,13 +9,21 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/browse_recipes">Selaa reseptejä</a>
-            </li>        
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/user_list">Käyttäjät</a>
+            </li>       
             {% if session.username %}
                 <li class="nav-item">
                     <a class="nav-link" href="/recipe_form/#new_recipe">Lisää resepti</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/logout">Kirjaudu ulos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user?username={{ session.username }}">
+                        {{ session.username }}
+                    </a>
                 </li>
             {% else %}
                <li class="nav-item">

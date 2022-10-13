@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+{% block title %}Uusi käyttäjä{% endblock %}
+{% block content %}
+    <h2>Luo uusi käyttäjä</h2>
+    <div class="form-group col-6">
+        <form action="/new_user_form" method="POST">
+            <input type="text" class="form-control" pattern="\S+.+" name="username" placeholder="käyttäjätunnus">
+            <input type="text" class="form-control" pattern="\S+" name="password" placeholder="salasana">
+            <input type="submit" class="btn btn-primary" name="submit_user" value="Luo käyttäjä">
+        </form>
+    </div>
+
+{% endblock %}

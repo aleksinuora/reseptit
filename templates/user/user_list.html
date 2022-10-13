@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Käyttäjät{% endblock %}
+{% block content%}
+    <ul>
+    {% for user in list_of_users %}
+        <li>
+            <a href="/user?username={{ user.userprofile_name }}">
+                {{ user.userprofile_name }}
+            </a>
+         </li>
+    {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block title %}
+    {{ params.recipe_name }}
+{% endblock %}
+{% block content %}
+    <h2>{{ params.recipe_name }}</h2>
+    {% if params.passive_time %}
+        <br />
+        Passiivinen valmistusaika: {{ params.passive_time }}
+    {% endif %}
+    {% if params.active_time %}
+        <br />
+        Aktiivinen valmistusaika: {{ params.active_time }}
+    {% endif %}
+    <ul>
+        {% for row in params.ingredient_list %}
+            <li>{{ row[0] }} {{ row[1] }} {{ row[2] }} </li>
+        {% endfor %}
+    </ul>
+    {% if params.recipe_description %}
+        <br />
+        <pre>{{ params.recipe_description }}</pre>
+    {% endif %}
+    {% if params.submitter %}
+        <br />
+        <br />
+        Lisännyt: 
+        <a href="/user?username={{ params.submitter }}">{{ params.submitter }}</a>
+        <br />
+        {{ params.created_at or '' }}
+    {% endif %}
+    {% if params.editing_rights %}
+        <br />
+        <form action="/recipe_form/?recipe_id={{ params.recipe_id }}" method="POST">
+            <button type="submit" name="edit_recipe" value="{{ params.recipe_id }}">Muokkaa</button>
+            {% include "params.html" %}
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        </form>
+        <form action="/delete_recipe?recipe_id={{ params.recipe_id }}" method="POST">
+            <button type="submit" name="delete_recipe" onclick="return confirm('Haluatko varmasti poistaa reseptin?')" value="Poista">Poista</button>
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        </form>
+    {% endif %}
+    <hr />
+    {% include "/recipe/elements/comment_section.html" %}
+{% endblock %}
+

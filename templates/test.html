@@ -1,0 +1,8 @@
+testitesti
+{{ params.arvo }}
+<form action="/test" method="POST">
+    <input type="text" name="arvo">
+    <input type="submit" name="lähetä">
+    {% include "params.html" %}
+</form>
+{{ params.arvo }}

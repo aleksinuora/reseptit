@@ -1,0 +1,6 @@
+Raaka-aine {{ i + 1 }}:
+<input type="number" step="any" name="quantity" placeholder=1.0 value="{{ quantities[i] }}" style="width: 7em">
+<input type="text" name="unit" placeholder="yksikkö" value="{{ units[i]  }}" size="3">
+<input type="text" name="ingredient_name" placeholder="nimi" value="{{ ingredient_names[i] }}">
+<button type="submit" name="remove_line" value="{{ i }}">poista</button>
+<br>

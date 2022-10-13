@@ -1,0 +1,18 @@
+<h3>Kommenttiosio</h3>
+{% if session.username %}
+    Lähetä kommentti:
+    <form action="/recipe?recipe_id={{ params.recipe_id }}" method="POST">
+    <textarea name="new_comment_text" rows="3" cols="25">{{ params.comment_to_edit.content or '' }}</textarea>
+    <br />
+    {% if params.comment_to_edit %}
+        <input type="submit" name="save_comment_edit" value="Tallenna">
+        <input type="hidden" name="comment_to_edit_id" value="{{ params.comment_to_edit.id }}">
+    {% else %}
+        <input type="submit" name="send_comment" value="Lähetä">
+    {% endif %}
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+    </form> 
+{% endif %}
+{% for comment in params.comments %}
+    {% include "/recipe/elements/comment.html" %}
+{% endfor %}

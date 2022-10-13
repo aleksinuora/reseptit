@@ -2,9 +2,9 @@
 {% block title %}Selaa reseptejä{% endblock %}
 {% block content %}
     <h3>Reseptihaku:</h3>
-    {% include "recipe_search.html" %}
+    {% include "/recipe/elements/recipe_search.html" %}
     <hr>
     {% if recipes %}
-        {% include "recipe_list.html" %}
+        {% include "/recipe/elements/recipe_list.html" %}
     {% endif %}
 {% endblock %}

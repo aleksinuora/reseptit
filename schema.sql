@@ -18,7 +18,7 @@ CREATE TABLE ingredient (
 );
 CREATE TABLE recipeingredient (
     recipe_id INTEGER REFERENCES recipe ON DELETE CASCADE,
-    ingredient_id INTEGER REFERENCES ingredient,
+    ingredient_id INTEGER REFERENCES ingredient ON DELETE CASCADE,
     unit TEXT,
     quantity FLOAT
 );

@@ -22,7 +22,7 @@
         <br>
         <textarea name="recipe_description" rows="10" cols="50">{{ params.recipe.recipe_description or '' }}</textarea>
         <br>
-        {% if params.editing %}
+        {% if editing %}
             <button type="submit" name="save_recipe_edit" value="{{ params.recipe_id }}">
                 Tallenna muutokset
             </button>

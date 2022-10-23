@@ -17,6 +17,20 @@ kirjautumista ja sitä vaativia ominaisuuksia:
 Käyttäjänimi='Testaaja'
 Salasana='salasana'
 
+### Sovelluksen tila, loppupalautus
+
+Palvelu näyttää etusivulla satunnaisen reseptiehdotuksen.
+Reseptejä voi selata vapaasti ja hakea lisääjän/raaka-aineiden
+perusteella.
+
+Käyttäjätilin luomisen ja kirjautumisen jälkeen käyttäjä voi
+myös lisätä, poistaa ja muokata omia reseptejään ja kommenttejaan.
+Käyttäjän omat reseptit ja kommentit näkyvät erillisellä profiilisivulla.
+
+Palvelussa on valmiiksi vapaasti käytettävä tili 'Testaaja' salasanalla
+'salasana' joka toimii lähes täysin samalla tavalla kuin tavalliset
+tilit. 'Testaaja' ei kuitenkaan voi poistaa omaa tiliään lopullisesti.
+
 ### Sovelluksen tila, välipalautus 3
 
 Toteutetut ominaisuudet:

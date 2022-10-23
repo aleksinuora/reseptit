@@ -1,15 +1,6 @@
 {% extends "layout.html" %}
-{% block title %}Reseptin lisäys{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 {% block content%}
-    <h2>result</h2>
-    Tulostustesti:
-    <br>
-    lähetettiin
-    <br>
-    {{ recipe }},
-    <br>
-    tietokanta tallensi
-    <br>
-    {{ result }}
-    <br>
+    <h2>{{ title }}</h2>
+    {{ message }}
 {% endblock %}

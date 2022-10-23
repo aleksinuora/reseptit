@@ -4,8 +4,16 @@
     <h2>Luo uusi käyttäjä</h2>
     <div class="form-group col-6">
         <form action="/new_user_form" method="POST">
-            <input type="text" class="form-control" pattern="\S+.+" name="username" placeholder="käyttäjätunnus">
-            <input type="text" class="form-control" pattern="\S+" name="password" placeholder="salasana">
+            <input type="text" class="form-control" pattern="\S+.*" name="username" placeholder="käyttäjätunnus"
+                minlength="3"
+                oninvalid="setCustomValidity('Käyttäjänimen tulee olla vähintään kolme merkkiä pitkä ' 
+                    + 'eikä se saa alkaa tai päättyä välilyönnillä')"
+                onvalid="setCustomValidity('')">
+            <input type="password" class="form-control" pattern="\S+" name="password" placeholder="salasana"
+                minlength="4"
+                oninvalid="setCustomValidity('Salasanan tulee olla vähintään neljä merkkiä pitkä ' 
+                    + 'eikä se saa sisältää välilyöntejä')"
+                onvalid="setCustomValidity('')">
             <input type="submit" class="btn btn-primary" name="submit_user" value="Luo käyttäjä">
         </form>
     </div>

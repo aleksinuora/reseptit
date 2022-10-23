@@ -1,11 +1,16 @@
 {% extends "layout.html" %}
 {% block title %}Uusi resepti{% endblock %}
 {% block content%}
-    <h2>Uusi resepti</h2>
+    {% if params.editing %}
+        <h2>Muokkaa</h2>
+    {% else %}
+        <h2>Uusi resepti</h2>
+    {% endif %}
     <a name="new_recipe"></a>
     <form action="/recipe_form/" method="POST">
         Reseptin nimi:
-        <input type="text" name="name" placeholder="nimi" value="{{ params.recipe.name }}" >
+        <input type="text" name="name" placeholder="nimi" 
+            value="{{ params.recipe.name }}" required="required">
         <br>
         Passiivinen valmistusaika:
         <input type="text" pattern="(\d+t|) (([0-5]?)(\d)m)" name="passive_time" value="{{ params.recipe.passive_time or '0t 00m' }}" size="2"> 
@@ -22,7 +27,7 @@
         <br>
         <textarea name="recipe_description" rows="10" cols="50">{{ params.recipe.recipe_description or '' }}</textarea>
         <br>
-        {% if editing %}
+        {% if params.editing %}
             <button type="submit" name="save_recipe_edit" value="{{ params.recipe_id }}">
                 Tallenna muutokset
             </button>
@@ -32,7 +37,7 @@
             </button>
         {% endif %}
         <input type="hidden" name="ingredient_lines" value={{ ingredient_lines or 1 }}>
-        <input type="hidden" name="editing" value="{{ params.editing or False }}">
+        <input type="hidden" name="editing" value="{{ params.editing or false }}">
         <input type="hidden" name="recipe_id" value="{{ params.recipe_id }}">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     </form>

@@ -1,33 +1,33 @@
 {% extends "layout.html" %}
-{% block title %}{{ username }}{% endblock %}
+{% block title %}{{ params.username }}{% endblock %}
 {% block content %}
-    <h2>{{ username }}</h2>
+    <h2>{{ params.username }}</h2>
     {% if recipes %}
         <b>Reseptit:</b>
         {% include "/recipe/elements/recipe_list.html" %}
     {% endif %}
-    {% if comments %}
+    {% if recipe_comments %}
         <b>Kommenttihistoria:</b>
-        <form action="/user?username={{ username }}" method="POST">
-            <button type="submit" name="hide_comments" value="{{ username }}">Piilota</button>
+        <form action="/user?username={{ params.username }}" method="POST">
+            <button type="submit" name="hide_comments" value="{{ params.username }}">Piilota</button>
         </form>
         <hr>
-        {% for comment in comments %}
+        {% for comment in recipe_comments %}
             (<a href="/recipe?recipe_id={{ comment.recipe_id }}#comment_{{ comment.id }}">Konteksti</a>)
             <br />
             {% include "/recipe/elements/comment.html" %}
         {% endfor %}
     {% else %}
-        <form action="/user?username={{ username }}" method="POST">
+        <form action="/user?username={{ params.username }}" method="POST">
             Näytä käyttäjän kommentit: 
-            <button type="submit" name="show_comments" value="{{ username }}">Näytä</button>
+            <button type="submit" name="show_comments" value="{{ params.username }}">Näytä</button>
         </form>
     {% endif %}
     <br />
-    {% if user_rights %}
-        <form action="/delete_user?username={{ username }}" method="POST">
+    {% if params.user_rights %}
+        <form action="/delete_user?username={{ params.username }}" method="POST">
             Poista tili:
-            <button type="submit" name="delete_button" onclick="return confirm('Haluatko varmasti poistaa käyttäjätilin?')" value={{ username }}>
+            <button type="submit" name="delete_button" onclick="return confirm('Haluatko varmasti poistaa käyttäjätilin?')" value={{ params.username }}>
                 poista
             </button>
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">

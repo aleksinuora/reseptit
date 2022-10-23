@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, session, url_for, abort
 from os import getenv
 import recipes
 import login
-from users import get_username, get_users, find_user, add_user, delete_user
+from users import get_username, get_users, find_user, add_user, delete_userprofile
 import comments
 from utilities.parsers import parse_form_to_recipe, parse_search, parse_recipe_to_form, parse_time_reverse
 from werkzeug.datastructures import ImmutableMultiDict
@@ -11,23 +11,6 @@ import collections
 import secrets
 
 app.secret_key = getenv("SECRET_KEY")
-
-# Testing certain functions
-@app.route("/test", methods=["GET", "POST"])
-def test():
-    if request.method == "GET":
-        params = {
-            "eka":1,
-            "toka":2,
-        }
-        return render_template("test.html", params=params)
-    elif request.method == "POST":
-        print(request.form)
-        params = dict(request.form)
-        print(params)
-        del params["lähetä"]
-        print(params)
-        return render_template("test.html", params=params)
 
 @app.route("/")
 def index():
@@ -106,11 +89,22 @@ def recipe_form():
         if session["csrf_token"] != request.form["csrf_token"]:
             abort(403)
         params = dict(request.form)
-        recipe = recipes.get_recipe(params["recipe_id"])
-        recipe_form = parse_recipe_to_form(recipe)
+        recipe_form = {
+            "name":params.get("name"),
+            "active_time":params.get("active_time"),
+            "passive_time":params.get("passive_time"),
+            "quantities":params.get("quantity"),
+            "units":params.get("unit"),
+            "ingredient_names":params.get("ingredient_name"),
+            "recipe_description":params.get("recipe_description")
+        }
         params["recipe"] = recipe_form
-        ingredient_lines = len(recipe_form["quantities"])
         if params.get("edit_recipe"):
+            params["editing"] = True
+            recipe = recipes.get_recipe(params["recipe_id"])
+            recipe_form = parse_recipe_to_form(recipe)
+            params["recipe"] = recipe_form
+            ingredient_lines = len(recipe_form["quantities"])
             return render_template("/recipe/recipe_form.html", \
                 recipe=recipe_form, \
                 quantities=recipe_form["quantities"], \
@@ -135,7 +129,8 @@ def recipe_form():
                 recipe["recipe_description"], user_id, \
                 recipe["ingredient_list"])
             return render_template("result.html", \
-                recipe=recipe, result=result)                
+                title=recipe["recipe_name"], \
+                message="Reseptin lisäys onnistui")                
         elif request.form.get("new_line") == "seuraava raaka-aine":
             ingredient_lines = int(request.form["ingredient_lines"]) + 1            
             quantities = request.form.getlist("quantity")
@@ -173,7 +168,8 @@ def recipe_form():
             "units":[],
             "ingredient_names":[]
         }
-        return render_template("/recipe/recipe_form.html", params=params)
+        return render_template("/recipe/recipe_form.html", recipe=[], \
+            quantities=[], units=[], ingredient_names=[], params=params)
 
 @app.route("/login", methods=["GET", "POST"])
 def handle_login():
@@ -182,29 +178,41 @@ def handle_login():
     username = request.form["username"]
     password = request.form["password"]
     user = login.check_login(username, password)
+    title = "Kirjautuminen"
     if user:
         session["username"] = user.userprofile_name
         session["userprofile_id"] = user.id
         session["csrf_token"] = secrets.token_hex(16)
-        print(session["csrf_token"])
-    return redirect("/")
+        message = "Kirjattiin sisään käyttäjä " + user.userprofile_name
+        return render_template("result.html", title=title, \
+            message=message)
+    else:
+        message = ("Kirjautuminen epäonnistui, \
+            tarkista käyttäjänimi ja salasana")
+        return render_template("result.html", title=title, message=message)
 
 @app.route("/logout")
 def logout():
+    message = "Käyttäjä " + session["username"] + " kirjattu ulos"
     del session["username"]
     del session["userprofile_id"]
-    return redirect("/")
+    del session["csrf_token"]
+    return render_template("result.html", title="Uloskirjautuminen", \
+        message=message)
 
 @app.route("/new_user_form", methods=["GET", "POST"])
 def new_user_form():
     if request.method == "GET":
         return render_template("/user/new_user_form.html")
     elif request.method == "POST":
-        if find_user(request.form.get("username")):
-            return render_template("/user/new_user_form.html")
-        add_user(request.form.get("username"), \
+        result = add_user(request.form.get("username"), \
             request.form.get("password"))
-        return redirect("/")
+        if result:
+            message = "Lisättiin käyttäjänimi " + result.userprofile_name
+        else:
+            message = "Käyttäjän lisääminen ei onnistunut, \
+                kokeile toista käyttäjänimeä"
+        return render_template("result.html", title="Uusi tili", message=message)
 
 @app.route("/delete_recipe", methods=["POST"])
 def delete_recipe():
@@ -248,13 +256,18 @@ def user():
     username = request.args.get("username", None)
     user_recipes = recipes.get_match_all({"user":username})
     recipe_comments = None
-    user_rights = (username == session.get("username", None)) or \
+    user_rights = (username == session.get("username")) or \
         (session.get("username") == "admin")
     if request.method == "POST":
         if request.form.get("show_comments"):
             recipe_comments = comments.get_user_comments(username)
-    return render_template("/user/user.html", user_rights=user_rights, \
-        username=username, recipes=user_recipes, comments=recipe_comments)
+    params = {
+            "username":username,
+            "user_rights":user_rights
+        }
+
+    return render_template("/user/user.html", params=params, \
+        recipe_comments=recipe_comments, recipes=user_recipes)
 
 @app.route("/delete_user", methods=["POST"])
 def delete_user():
@@ -265,7 +278,7 @@ def delete_user():
     user_rights = username == session_user or \
         session_user == "admin"
     if user_rights:
-        delete_user(username, user=session_user)
+        delete_userprofile(username, session_user)
     if session.get("username") != "admin":
         return redirect("/logout")
     return redirect("/")
